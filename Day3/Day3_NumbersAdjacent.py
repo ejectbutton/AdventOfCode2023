@@ -1,63 +1,63 @@
 sourceFile = open('Day3\input.txt', 'r')
 lines = sourceFile.readlines()
-runningTotal = 0
 lineLength = 140
+runningTotal = 0
+topLine = ''
+midLine = ''
+lowLine = ''
 
-def findAdjacentChars(currentNum, charIdx):
+def searchForAdjacentChar(number, numIndex):
 
-    for char in currentNum:
-        # Check 3 spots above
-        if charIdx - (lineLength+1) > 0 and (singleFileLine[charIdx-(lineLength+1)].isnumeric() == False and 
-                                  singleFileLine[charIdx-(lineLength+1)] != '.'):
-            return True
-        if charIdx - lineLength > 0 and (singleFileLine[charIdx-lineLength].isnumeric() == False and 
-                                  singleFileLine[charIdx-lineLength] != '.'):
-            return True
-        if charIdx - (lineLength-1) > 0 and (singleFileLine[charIdx-(lineLength-1)].isnumeric() == False and 
-                                  singleFileLine[charIdx-(lineLength-1)] != '.'):
-            return True
+    if ((topLine != '' and numIndex > 0 and topLine[numIndex-1].isnumeric() == False and topLine[numIndex-1] != '.') or
+        (topLine != '' and topLine[numIndex].isnumeric() == False and topLine[numIndex] != '.') or
+        (topLine != '' and numIndex < lineLength and topLine[numIndex+1].isnumeric() == False and topLine[numIndex+1] != '.') or
+        (numIndex > 0 and midLine[numIndex-1].isnumeric() == False and midLine[numIndex-1] != '.') or
+        (numIndex < lineLength and midLine[numIndex+1].isnumeric() == False and midLine[numIndex+1] != '.') or
+        (lowLine != '' and numIndex > 0 and lowLine[numIndex-1].isnumeric() == False and lowLine[numIndex-1] != '.') or
+        (lowLine != '' and lowLine[numIndex].isnumeric() == False and lowLine[numIndex] != '.') or
+        (lowLine != '' and numIndex < lineLength and lowLine[numIndex+1].isnumeric() == False and lowLine[numIndex+1] != '.')):
         
-        # Check the left & right
-        if charIdx - 1 > 0 and (singleFileLine[charIdx-1].isnumeric() == False and 
-                                  singleFileLine[charIdx-1] != '.'):
-            return True
-        if charIdx + 1 < len(singleFileLine) and (singleFileLine[charIdx+1].isnumeric() == False and 
-                                                  singleFileLine[charIdx+1] != '.'):
-            return True
-        
-        # Check 3 spots below
-        if charIdx + (lineLength-1) < len(singleFileLine) and (singleFileLine[charIdx+(lineLength-1)].isnumeric() == False and 
-                                                  singleFileLine[charIdx+(lineLength-1)] != '.'):
-            return True
-        if charIdx + lineLength < len(singleFileLine) and (singleFileLine[charIdx+lineLength].isnumeric() == False and 
-                                                  singleFileLine[charIdx+lineLength] != '.'):
-            return True
-        if charIdx + (lineLength+1) < len(singleFileLine) and (singleFileLine[charIdx+(lineLength+1)].isnumeric() == False and 
-                                                  singleFileLine[charIdx+(lineLength+1)] != '.'):
-            return True
-        
-        # Move on to next char index
-        charIdx += 1
+        return True
 
     return False
 
+# end searchForAdjacentChar
 
-# Set up entire file as one line
-singleFileLine = ''
-for line in lines:
-    singleFileLine += line.rstrip()
+def iterateThroughMidLine():
+    global runningTotal
+    currentNum = ''
+    for midLineIndex in range(len(midLine)):
+        if midLine[midLineIndex].isnumeric():
+            currentNum += midLine[midLineIndex]
+            continue
 
-currentNum = ''
-for charIdx in range(len(singleFileLine)):
-    if singleFileLine[charIdx].isnumeric():
-        currentNum += singleFileLine[charIdx]
-        continue
-    elif len(currentNum) > 0:
-        if findAdjacentChars(currentNum, charIdx-len(currentNum)):
-            runningTotal += int(currentNum)
+        if currentNum != '':
+            for charNumber in range(len(currentNum)):
+                if searchForAdjacentChar(currentNum, midLineIndex-(charNumber+1)):
+                    runningTotal += int(currentNum)
+                    break
+        
         currentNum = ''
 
+for line in lines:
+    topLine = midLine
+    midLine = lowLine
+    lowLine = line.rstrip()
+
+    iterateThroughMidLine()
+    
+
+# Finally, search the final line
+topLine = midLine
+midLine = lowLine
+lowLine = ''
+iterateThroughMidLine()
 
 print(runningTotal)
+        
+
+
+
+
 
 
